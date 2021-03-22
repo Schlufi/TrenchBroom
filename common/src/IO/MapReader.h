@@ -21,6 +21,7 @@
 
 #include "FloatType.h"
 #include "IO/StandardMapParser.h"
+#include "Model/BezierPatch.h"
 #include "Model/Brush.h"
 #include "Model/BrushFace.h"
 #include "Model/IdType.h"
@@ -82,7 +83,17 @@ namespace TrenchBroom {
                 std::optional<size_t> parentIndex;
             };
 
-            using ObjectInfo = std::variant<EntityInfo, BrushInfo>;
+            struct PatchInfo {
+                size_t rowCount;
+                size_t columnCount;
+                std::vector<Model::BezierPatch::Point> controlPoints;
+                std::string textureName;
+                size_t startLine;
+                size_t lineCount;
+                std::optional<size_t> parentIndex;
+            };
+
+            using ObjectInfo = std::variant<EntityInfo, BrushInfo, PatchInfo>;
         private:
             vm::bbox3 m_worldBounds;
         private: // data populated in response to MapParser callbacks

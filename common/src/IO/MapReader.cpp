@@ -30,6 +30,7 @@
 #include "Model/GroupNode.h"
 #include "Model/LayerNode.h"
 #include "Model/LockState.h"
+#include "Model/PatchNode.h"
 #include "Model/VisibilityState.h"
 #include "Model/WorldNode.h"
 
@@ -63,7 +64,7 @@ namespace TrenchBroom {
 
         void MapReader::readBrushes(const vm::bbox3& worldBounds, ParserStatus& status) {
             m_worldBounds = worldBounds;
-            parseBrushes(status);
+            parseBrushesOrPatches(status);
             createNodes(status);
         }
 
@@ -122,7 +123,9 @@ namespace TrenchBroom {
             });
         }
 
-        void MapReader::onPatch(const size_t, const size_t, Model::MapFormat, const size_t, const size_t, std::vector<vm::vec<FloatType, 5>>, std::string, ParserStatus&) {}
+        void MapReader::onPatch(const size_t startLine, const size_t lineCount, Model::MapFormat, const size_t rowCount, const size_t columnCount, std::vector<vm::vec<FloatType, 5>> controlPoints, std::string textureName, ParserStatus&) {
+            m_objectInfos.push_back(PatchInfo{rowCount, columnCount, std::move(controlPoints), std::move(textureName), startLine, lineCount, m_currentEntityInfo});
+        }
 
         // helper methods
         
@@ -427,6 +430,22 @@ namespace TrenchBroom {
         }
 
         /**
+         * Creates a patch node from the given patch info.
+         */
+        static CreateNodeResult createPatchNode(MapReader::PatchInfo patchInfo) {
+            auto patchNode = std::make_unique<Model::PatchNode>(Model::BezierPatch{patchInfo.rowCount, patchInfo.columnCount, std::move(patchInfo.controlPoints), std::move(patchInfo.textureName)});
+            patchNode->setFilePosition(patchInfo.startLine, patchInfo.lineCount);
+
+            auto parentInfo = patchInfo.parentIndex ? ParentInfo{*patchInfo.parentIndex} : std::optional<ParentInfo>{};
+
+            return NodeInfo{
+                std::move(patchNode),
+                std::move(parentInfo),
+                {} // issues
+            };
+        }
+
+        /**
         * Transforms the given object infos into a vector of node infos. The returned vector is sparse, that is,
         * it contains empty optionals in place of nodes that we failed to create. We need the indices to remain
         * correct because we use them to refer to parent nodes later.
@@ -441,6 +460,9 @@ namespace TrenchBroom {
                     },
                     [&](MapReader::BrushInfo&& brushInfo) {
                         return createBrushNode(std::move(brushInfo), worldBounds);
+                    },
+                    [&](MapReader::PatchInfo&& patchInfo) {
+                        return createPatchNode(std::move(patchInfo));
                     }
                 ), std::move(objectInfo));
             });
