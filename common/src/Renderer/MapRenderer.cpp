@@ -336,6 +336,7 @@ namespace TrenchBroom {
                 std::vector<Model::GroupNode*> groups;
                 std::vector<Model::EntityNode*> entities;
                 std::vector<Model::BrushNode*> brushes;
+                std::vector<Model::PatchNode*> patches;
             };
 
             RenderableNodes defaultNodes;
@@ -380,23 +381,35 @@ namespace TrenchBroom {
                         if (renderDefault) defaultNodes.brushes.push_back(brush);
                     }
                 },
-                [] (Model::PatchNode*) {}
+                [&](Model::PatchNode* patchNode) {
+                    if (patchNode->locked()) {
+                        if (renderLocked) lockedNodes.patches.push_back(patchNode);
+                    } else if (selected(patchNode)) {
+                        if (renderSelection) selectedNodes.patches.push_back(patchNode);
+                    }
+                    if (!patchNode->selected() && !patchNode->parentSelected() && !patchNode->locked()) {
+                        if (renderDefault) defaultNodes.patches.push_back(patchNode);
+                    }
+                }
             ));
 
             if (renderDefault) {
                 m_defaultRenderer->setObjects(defaultNodes.groups,
                                               defaultNodes.entities,
-                                              defaultNodes.brushes);
+                                              defaultNodes.brushes,
+                                              defaultNodes.patches);
             }
             if (renderSelection) {
                 m_selectionRenderer->setObjects(selectedNodes.groups,
                                                 selectedNodes.entities,
-                                                selectedNodes.brushes);
+                                                selectedNodes.brushes,
+                                                selectedNodes.patches);
             }
             if (renderLocked) {
                 m_lockedRenderer->setObjects(lockedNodes.groups,
                                              lockedNodes.entities,
-                                             lockedNodes.brushes);
+                                             lockedNodes.brushes,
+                                             lockedNodes.patches);
             }
             invalidateEntityLinkRenderer();
         }
