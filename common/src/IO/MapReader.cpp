@@ -122,6 +122,8 @@ namespace TrenchBroom {
             });
         }
 
+        void MapReader::onPatch(const size_t, const size_t, Model::MapFormat, const size_t, const size_t, std::vector<vm::vec<FloatType, 5>>, std::string, ParserStatus&) {}
+
         // helper methods
         
         namespace {
@@ -489,7 +491,8 @@ namespace TrenchBroom {
                             return false;
                         },
                         [] (Model::EntityNode*) { return false; },
-                        [] (Model::BrushNode*) { return false; }
+                        [] (Model::BrushNode*) { return false; },
+                        [] (Model::PatchNode*) { return false; }
                     ));
 
                     if (clearNode) {
@@ -539,7 +542,8 @@ namespace TrenchBroom {
                             assertResult(groupIdMap.emplace(persistentId, groupNode).second);
                         },
                         [] (Model::EntityNode*) {},
-                        [] (Model::BrushNode*) {}
+                        [] (Model::BrushNode*) {},
+                        [] (Model::PatchNode*) {}
                     ));
                 }
             }
@@ -647,6 +651,9 @@ namespace TrenchBroom {
                             onNode(parentNode, std::move(node), status);
                         },
                         [&](Model::BrushNode*) {
+                            onNode(parentNode, std::move(node), status);
+                        },
+                        [&](Model::PatchNode*) {
                             onNode(parentNode, std::move(node), status);
                         }
                     ));

@@ -28,6 +28,7 @@
 #include "Model/EntityNode.h"
 #include "Model/GroupNode.h"
 #include "Model/Node.h"
+#include "Model/PatchNode.h"
 
 #include <kdl/overload.h>
 #include <kdl/vector_utils.h>
@@ -74,7 +75,8 @@ namespace TrenchBroom {
                         entity->visitChildren(thisLambda);
                     }
                 },
-                [&](BrushNode* brush) { nodes.push_back(brush); }
+                [&](BrushNode* brush) { nodes.push_back(brush); },
+                [&](PatchNode* patch) { nodes.push_back(patch); }
             ));
 
             return true;

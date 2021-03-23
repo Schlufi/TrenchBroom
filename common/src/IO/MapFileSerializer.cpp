@@ -249,7 +249,8 @@ namespace TrenchBroom {
                 [](auto&& thisLambda, const Model::EntityNode* entity) { entity->visitChildren(thisLambda); },
                 [&](const Model::BrushNode* brush) {
                     brushNodes.push_back(brush);
-                }
+                },
+                [](const Model::PatchNode*) {}
             ));
 
             // serialize brushes to strings in parallel
@@ -312,6 +313,8 @@ namespace TrenchBroom {
             face.setFilePosition(m_line, lines);
             m_line += lines;
         }
+
+        void MapFileSerializer::doPatch(const Model::PatchNode*) {}
 
         void MapFileSerializer::setFilePosition(const Model::Node* node) {
             const size_t start = startLine();

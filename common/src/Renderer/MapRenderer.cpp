@@ -30,6 +30,7 @@
 #include "Model/GroupNode.h"
 #include "Model/LayerNode.h"
 #include "Model/Node.h"
+#include "Model/PatchNode.h"
 #include "Model/WorldNode.h"
 #include "Renderer/BrushRenderer.h"
 #include "Renderer/EntityLinkRenderer.h"
@@ -378,7 +379,8 @@ namespace TrenchBroom {
                     if (!brush->selected() && !brush->parentSelected() && !brush->locked()) {
                         if (renderDefault) defaultNodes.brushes.push_back(brush);
                     }
-                }
+                },
+                [] (Model::PatchNode*) {}
             ));
 
             if (renderDefault) {

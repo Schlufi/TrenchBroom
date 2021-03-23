@@ -106,7 +106,8 @@ namespace TrenchBroom {
                 [](const LayerNode*)  { return false; },
                 [](const GroupNode*)  { return false; },
                 [](const EntityNode*) { return false; },
-                [](const BrushNode*)  { return true;  }
+                [](const BrushNode*)  { return true;  },
+                [](const PatchNode*)  { return true;  }
             ));
         }
 

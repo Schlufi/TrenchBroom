@@ -170,6 +170,10 @@ namespace TrenchBroom {
 
             m_currentObject.faces.push_back(Face(indexedVertices, face.attributes().textureName(), face.texture()));
         }
+
+        void ObjFileSerializer::doPatch(const Model::PatchNode*) {
+            // todo 2429: implement this
+        }
     }
 }
 

@@ -23,6 +23,7 @@
 #include "FloatType.h"
 #include "Polyhedron.h"
 #include "Polyhedron_Matcher.h"
+#include "Model/BezierPatch.h"
 #include "Model/Brush.h"
 #include "Model/BrushError.h"
 #include "Model/BrushFace.h"
@@ -33,6 +34,7 @@
 #include "Model/IssueGenerator.h"
 #include "Model/LayerNode.h"
 #include "Model/ModelUtils.h"
+#include "Model/PatchNode.h"
 #include "Model/PickResult.h"
 #include "Model/TagVisitor.h"
 #include "Model/TexCoordSystem.h"
@@ -81,7 +83,8 @@ namespace TrenchBroom {
                 [](const EntityNode* entity)                  -> const EntityNodeBase* { return entity; },
                 [](auto&& thisLambda, const LayerNode* layer) -> const EntityNodeBase* { return layer->visitParent(thisLambda).value_or(nullptr); },
                 [](auto&& thisLambda, const GroupNode* group) -> const EntityNodeBase* { return group->visitParent(thisLambda).value_or(nullptr); },
-                [](auto&& thisLambda, const BrushNode* brush) -> const EntityNodeBase* { return brush->visitParent(thisLambda).value_or(nullptr); }
+                [](auto&& thisLambda, const BrushNode* brush) -> const EntityNodeBase* { return brush->visitParent(thisLambda).value_or(nullptr); },
+                [](auto&& thisLambda, const PatchNode* patch) -> const EntityNodeBase* { return patch->visitParent(thisLambda).value_or(nullptr); }
             )).value_or(nullptr);
         }
 
@@ -247,7 +250,8 @@ namespace TrenchBroom {
                 [](const LayerNode*)          { return false; },
                 [&](const GroupNode* group)   { return m_brush.contains(group->logicalBounds()); },
                 [&](const EntityNode* entity) { return m_brush.contains(entity->logicalBounds()); },
-                [&](const BrushNode* brush)   { return m_brush.contains(brush->brush()); }
+                [&](const BrushNode* brush)   { return m_brush.contains(brush->brush()); },
+                [&](const PatchNode*)         { return false; } // todo: implement
             ));
         }
 
@@ -257,7 +261,8 @@ namespace TrenchBroom {
                 [](const LayerNode*)          { return false; },
                 [&](const GroupNode* group)   { return m_brush.intersects(group->logicalBounds()); },
                 [&](const EntityNode* entity) { return m_brush.intersects(entity->logicalBounds()); },
-                [&](const BrushNode* brush)   { return m_brush.intersects(brush->brush()); }
+                [&](const BrushNode* brush)   { return m_brush.intersects(brush->brush()); },
+                [&](const PatchNode*)         { return false; } // todo: implement
             ));
         }
 

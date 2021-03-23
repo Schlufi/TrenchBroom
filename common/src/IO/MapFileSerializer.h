@@ -56,6 +56,8 @@ namespace TrenchBroom {
             void doEntityProperty(const Model::EntityProperty& attribute) override;
             void doBrush(const Model::BrushNode* brush) override;
             void doBrushFace(const Model::BrushFace& face) override;
+
+            void doPatch(const Model::PatchNode* patchNode) override;
         private:
             void setFilePosition(const Model::Node* node);
             size_t startLine();
